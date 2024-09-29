@@ -9,7 +9,7 @@ app.listen(API_PORT, (async(error) => {
     }
     await dbConnection()
     const URL = `http://${API_HOST}:${API_PORT}`
-    const apiUrl = `${URL}/${API_VERSION}`
+    const apiUrl = `${URL}${API_VERSION}`
 
     console.log(`Server url is: ${URL}`)
     console.log(`API Url is: ${apiUrl}`)
