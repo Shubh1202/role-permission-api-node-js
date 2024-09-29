@@ -2,7 +2,7 @@ const express = require("express")
 const router = express.Router();
 const userRoute = require("./users")
 const permissionRoute = require("./permissions")
-const roleRoute = require("./role")
+const roleRoute = require("./roles")
 
 router.use("/users", userRoute)
 router.use("/permissions", permissionRoute)

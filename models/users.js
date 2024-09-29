@@ -1,6 +1,5 @@
 const mongoose = require("mongoose");
 const bcryptjs = require("bcryptjs")
-const validator = require("validator")
 const jsonwebtoken = require('jsonwebtoken')
 
 const userSchema = new mongoose.Schema({
@@ -11,12 +10,6 @@ const userSchema = new mongoose.Schema({
     email: {
         type: String,
         required: true,
-        validate: {
-            validator: function(v){
-                return true
-            },
-            message: "Enter valid email address"
-        },
         unique: true,
         trim: true
     },
@@ -25,11 +18,11 @@ const userSchema = new mongoose.Schema({
         required: true,
         select: false
     },
-    role:[{
+    role:{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'roles',
         required: true
-    }],
+    },
 },{
     timestamps: true
 })
@@ -39,12 +32,12 @@ userSchema.pre('save', async function(next) {
         next()
     }
 
-    this.password = await bcryptjs.hashSync(this.password, +process.env.PASSWORD_SALT)
+    this.password = bcryptjs.hashSync(this.password, +process.env.PASSWORD_SALT)
     next()
 })
 
 userSchema.methods.comparePassword = (async function(password){
-    return await bcryptjs.compareSync(password, this.password)
+    return bcryptjs.compareSync(password, this.password)
 })
 
 

@@ -9,14 +9,15 @@ const permissionSchema = new mongoose.Schema({
     slug:{
         type: String,
         // required: true,
-        trim: true
+        trim: true,
+        unique: true
     },
     description:{
         type: String,
     },
     is_default:{
         type: Number,
-        enum: [0, 1], // 0 -> not default, 1 -> default (basically for Admin)
+        enum: [0, 1],
         default: 0
     }
 },

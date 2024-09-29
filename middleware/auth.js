@@ -1,5 +1,6 @@
 const jsonwebtoken = require('jsonwebtoken')
 const userModel = require("../models/users")
+const { jwtDecode }  = require("jwt-decode")
 
 const authUser = (async (req, res, next) => {
     try{
@@ -36,9 +37,8 @@ const authUser = (async (req, res, next) => {
             }
         )
 
-        const dbResponse = await userModel.findById(jwtResponse.id).populate('role', ['role_name', '-_id'])
-        
-
+        const dbResponse = await userModel.findById(jwtResponse.id).populate({path: 'role', select: ['role_name', 'permissions', "-_id"], populate: ({path: 'permissions', select: ['slug', "-_id"]})})
+    
         if(!dbResponse){
             obj = {
                 http_code: 401,
@@ -48,7 +48,33 @@ const authUser = (async (req, res, next) => {
             throw obj            
         }
 
-        console.log(dbResponse)
+        const methodObject = {
+            create: 'POST',
+            update: 'PUT',
+            delete: 'DELETE',
+            read: 'GET',
+            "full-access": "full-access",
+        }
+
+        // console.log(`req method ==> `,req.method)
+        console.log(`Logged in user ==> `,dbResponse)
+        // console.log(`Logged in user Role ==> `,dbResponse?.role)
+        // console.log(`Logged in user Permission ==> `,dbResponse?.role?.permissions)
+
+        if(dbResponse.role?.role_name !== 'admin'){
+            const permissions = dbResponse.role?.permissions?.map(data => methodObject[data?.slug])
+            const hasPermission = permissions.find(prx => prx === req.method || prx === 'full-access')
+            console.log(permissions)
+            console.log(hasPermission)
+            if(!hasPermission){
+                obj = {
+                    http_code: 401,
+                    status: 'error',
+                    message: "Access Forbidden: You don't have permission to access this resource"
+                }
+                throw obj      
+            }
+        }
 
         req.user = dbResponse
 
@@ -64,8 +90,9 @@ const authUser = (async (req, res, next) => {
 const authorizeRole = ((...role) => {
     return ((req, res, next) => {
         try{
-            const isAuth = role.includes(req.user?.role[0]['role_name'])
+            const isAuth = role.includes(req.user?.role?.role_name)
             let obj = {}
+
             if(!isAuth){
                 obj = {
                     http_code: 401,
@@ -74,6 +101,8 @@ const authorizeRole = ((...role) => {
 
                 throw obj
             }
+
+            const hasPermission = 
 
             next()
 

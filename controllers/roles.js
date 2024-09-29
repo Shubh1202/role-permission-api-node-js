@@ -36,7 +36,7 @@ const getRole = (async(req, res, next)=>{
     try{
         let obj = {}
 
-        const dbResponse = await  roleModel.find({value: {$ne: 1 }})
+        const dbResponse = await  roleModel.find({slug: {$ne: 'admin' }})
 
         if(!dbResponse){
             obj = {

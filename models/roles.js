@@ -1,11 +1,5 @@
 const mongoose = require("mongoose");
 
-/*
-0 -> user
-1 -> admin
-2 -> subadmin
-3 -> editor
-*/
 const roleSchema = new mongoose.Schema({
     role_name: {
         type: String,
@@ -22,9 +16,6 @@ const roleSchema = new mongoose.Schema({
             required: true
         }
     ]
-    // value: {
-    //     type: Number,
-    // },
 },
 {
     timestamps: true
